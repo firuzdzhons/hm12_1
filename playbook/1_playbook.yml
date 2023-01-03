@@ -1,0 +1,21 @@
+- name: Clear log files
+  hosts: all
+  become: true
+  
+  vars:
+    age:  30
+    path: /var/log/sites
+  
+  tasks:
+    - name: find all files that are older than {{ age }} days
+      find:
+        paths: "{{ path }}"
+        age: "{{ age }}d"
+        recurse: yes
+      register: logFiles
+
+    - name: remove older than {{ age }} days
+      file:
+        path: "{{ item.path }}" 
+        state: absent
+      with_items: "{{ logFiles.files }}"
